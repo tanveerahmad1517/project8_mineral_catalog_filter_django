@@ -40,8 +40,8 @@
           {% block content %}{% endblock %}
           <div class="grid-25 grid-pull-60">
             <div class="sidebar__container">
-              <form class="search__form">
-                <input type="text" placeholder="Search...">
+              <form class="search__form" action="{% url 'minerals:search' %}" method="GET">
+                <input type="text" placeholder="Search..." name="q">
                 <input class="search__button" type="submit" value="Search">
               </form>
               <div class="circle--filter circle--secondary--module">
