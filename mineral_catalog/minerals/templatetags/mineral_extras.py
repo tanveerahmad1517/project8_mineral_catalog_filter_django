@@ -21,7 +21,7 @@ def random_mineral():
 
 
 @register.inclusion_tag('minerals/list_of_categories.html')
-def list_of_categories():
+def list_of_categories(category):
     """Shows a list of clickable mineral categories."""
     categories = [
         'silicate',
@@ -38,7 +38,7 @@ def list_of_categories():
         'native',
         'other',
     ]
-    return {'categories': categories}
+    return {'categories': categories, 'chosen_category': category}
 
 
 @register.filter('underscore_to_space')

@@ -94,4 +94,5 @@ def mineral_by_category(request, category):
         )
     else:
         minerals = Mineral.objects.filter(category__icontains=category)
-    return render(request, 'minerals/index.html', {'minerals': minerals})
+    return render(request, 'minerals/index.html',
+                  {'minerals': minerals, 'chosen_category': category})
