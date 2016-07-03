@@ -1,0 +1,12 @@
+{% load mineral_extras %}
+
+<h4>Color</h4>
+<ul class="circle--link--list">
+    {% for color in colors %}
+        {% if color == chosen_color %}
+            <li><a href="{% url 'minerals:color' color=color %}">{{ color|title|highlight }}</a></li>
+        {% else %}
+            <li><a href="{% url 'minerals:color' color=color %}">{{ color|title }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>

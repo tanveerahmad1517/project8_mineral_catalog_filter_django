@@ -1,12 +1,12 @@
 {% load mineral_extras %}
 
 <h4>Category</h4>
-  <ul class="circle--link--list">
-      {% for category in categories %}
-          {% if category == chosen_category %}
-              <li><a href="{% url 'minerals:category' category=category %}">{{ category|title|highlight }}</a></li>
-          {% else %}
-              <li><a href="{% url 'minerals:category' category=category %}">{{ category|title }}</a></li>
-          {% endif %}
-      {% endfor %}
-  </ul>
+<ul class="circle--link--list">
+  {% for category in categories %}
+      {% if category == chosen_category %}
+          <li><a href="{% url 'minerals:category' category=category %}">{{ category|title|highlight }}</a></li>
+      {% else %}
+          <li><a href="{% url 'minerals:category' category=category %}">{{ category|title }}</a></li>
+      {% endif %}
+  {% endfor %}
+</ul>

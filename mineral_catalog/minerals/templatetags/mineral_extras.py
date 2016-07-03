@@ -41,6 +41,23 @@ def list_of_categories(category):
     return {'categories': categories, 'chosen_category': category}
 
 
+@register.inclusion_tag('minerals/list_of_colors.html')
+def list_of_colors(color):
+    """Shows a list of clickable mineral colors."""
+    colors = [
+        'red',
+        'orange',
+        'yellow',
+        'green',
+        'blue',
+        'purple',
+        'black',
+        'white',
+        'other'
+    ]
+    return {'colors': colors, 'chosen_color': color}
+
+
 @register.filter('underscore_to_space')
 def underscore_to_space(string):
     """Changes underscore to a space."""

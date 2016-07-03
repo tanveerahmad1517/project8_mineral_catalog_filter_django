@@ -96,3 +96,20 @@ def mineral_by_category(request, category):
         minerals = Mineral.objects.filter(category__icontains=category)
     return render(request, 'minerals/index.html',
                   {'minerals': minerals, 'chosen_category': category})
+
+def mineral_by_color(request, color):
+    if color == 'other':
+        minerals = Mineral.objects.exclude(
+            Q(color__icontains='red') |
+            Q(color__icontains='orange') |
+            Q(color__icontains='yellow') |
+            Q(color__icontains='green') |
+            Q(color__icontains='blue') |
+            Q(color__icontains='purple') |
+            Q(color__icontains='black') |
+            Q(color__icontains='white')
+        )
+    else:
+        minerals = Mineral.objects.filter(color__icontains=color)
+    return render(request, 'minerals/index.html',
+                  {'minerals': minerals, 'chosen_color': color})
