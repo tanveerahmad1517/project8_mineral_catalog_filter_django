@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from django.db.models import Q
 from django.db.models.functions import Lower
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
 
@@ -13,8 +14,7 @@ def mineral_list(request):
 
 
 def mineral_detail(request, pk):
-    mineral_fields = {}
-    ordered_mineral_properties = OrderedDict()
+    ordered_properties = OrderedDict()
     order = [
         'category',
         'formula',
@@ -30,18 +30,19 @@ def mineral_detail(request, pk):
         'streak',
         'optical_properties'
     ]
-    mineral = get_object_or_404(Mineral, pk=pk)
-    fields = mineral._meta.get_fields()
-    # Make a dictionary with all mineral fields.
-    for field in fields:
-        mineral_fields[field.name] = getattr(mineral, field.name)
+    if Mineral.objects.filter(id=pk).exists():
+        # Get a dictionary with all mineral fields.
+        mineral = Mineral.objects.filter(id=pk).values()[0]
+    else:
+        raise Http404
+
     # Make an ordered dictionary with a predefined order.
     for key in order:
         # Add only those fields that have a value.
-        if mineral_fields[key]:
-            ordered_mineral_properties[key] = mineral_fields[key]
+        if mineral[key]:
+            ordered_properties[key] = mineral[key]
     return render(request, 'minerals/detail.html',
-                  {'mineral': mineral, 'fields': ordered_mineral_properties})
+                  {'mineral': mineral, 'properties': ordered_properties})
 
 
 def mineral_startswith(request, first_letter):

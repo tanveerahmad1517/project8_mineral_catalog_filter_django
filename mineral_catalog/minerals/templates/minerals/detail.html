@@ -12,7 +12,7 @@
       </div>
       <div class="mineral__table-container">
         <table class="mineral__table">
-          {% for name, value in fields.items %}
+          {% for name, value in properties.items %}
             {% if value %}
               <tr>
                   <td class="mineral__category">{{ name|underscore_to_space|title }}</td>
