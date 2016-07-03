@@ -50,9 +50,10 @@ def mineral_startswith(request, first_letter):
 
 
 def search(request):
+    """Searches all the info displayed on the mineral detail page."""
     term = request.GET.get('q')
     minerals = Mineral.objects.filter(
-        Q(name__icontains=term)|
+        Q(name__icontains=term) |
         Q(image_caption__icontains=term) |
         Q(category__icontains=term) |
         Q(formula__icontains=term) |
@@ -71,4 +72,25 @@ def search(request):
         Q(crystal_habit__icontains=term) |
         Q(specific_gravity__icontains=term)
     )
+    return render(request, 'minerals/index.html', {'minerals': minerals})
+
+
+def mineral_by_category(request, category):
+    if category == 'other':
+        minerals = Mineral.objects.exclude(
+            Q(category__icontains='silicate') |
+            Q(category__icontains='oxide') |
+            Q(category__icontains='sulfate') |
+            Q(category__icontains='sulfide') |
+            Q(category__icontains='carbonate') |
+            Q(category__icontains='halide') |
+            Q(category__icontains='sulfosalt') |
+            Q(category__icontains='phosphate') |
+            Q(category__icontains='borate') |
+            Q(category__icontains='organic') |
+            Q(category__icontains='arsenate') |
+            Q(category__icontains='native')
+        )
+    else:
+        minerals = Mineral.objects.filter(category__icontains=category)
     return render(request, 'minerals/index.html', {'minerals': minerals})

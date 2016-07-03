@@ -19,6 +19,27 @@ def random_mineral():
     return {'mineral': mineral}
 
 
+@register.inclusion_tag('minerals/list_of_categories.html')
+def list_of_categories():
+    """Shows a list of clickable mineral categories."""
+    categories = [
+        'silicate',
+        'oxide',
+        'sulfate',
+        'sulfide',
+        'carbonate',
+        'halide',
+        'sulfosalt',
+        'phosphate',
+        'borate',
+        'organic',
+        'arsenate',
+        'native',
+        'other',
+    ]
+    return {'categories': categories}
+
+
 @register.filter('underscore_to_space')
 def underscore_to_space(string):
     """Changes underscore to a space."""
