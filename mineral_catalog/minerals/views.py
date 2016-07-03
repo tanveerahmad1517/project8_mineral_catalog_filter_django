@@ -47,7 +47,7 @@ def mineral_detail(request, pk):
 
 def mineral_startswith(request, first_letter):
     minerals = Mineral.objects.filter(name__startswith=first_letter)
-    return render(request, 'minerals/index.html', {'minerals': minerals})
+    return render(request, 'minerals/index.html', {'minerals': minerals, 'chosen_letter': first_letter})
 
 
 def search(request):

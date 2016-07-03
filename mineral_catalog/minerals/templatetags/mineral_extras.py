@@ -2,6 +2,7 @@ import random
 from urllib.parse import quote
 from django import template
 from django.db.models import Count
+from django.utils.html import mark_safe
 from django.utils.six.moves.urllib.parse import unquote
 
 from minerals.models import Mineral
@@ -57,3 +58,8 @@ def url_decode(value):
 def url_quote(value):
     new_value = quote(value)
     return new_value
+
+
+@register.filter('highlight')
+def highlight(word):
+    return mark_safe("<span class='highlight'>%s</span>" % word)

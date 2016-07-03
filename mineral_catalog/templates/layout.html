@@ -29,8 +29,12 @@
     <div class="grid-100">
       <div class="alpha__container">
         <ul class="alpha__list">
-            {% for letter in 'absdefghijklmnopqrstuvwxyz' %}
-                <li><a href="{% url 'minerals:startswith' first_letter=letter %}">{{ letter|upper }}</a></li>
+            {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
+                {% if letter == chosen_letter %}
+                    <li><a href="{% url 'minerals:startswith' first_letter=letter %}">{{ letter|upper|highlight }}</a></li>
+                {% else %}
+                    <li><a href="{% url 'minerals:startswith' first_letter=letter %}">{{ letter|upper }}</a></li>
+                {%  endif %}
             {% endfor %}
         </ul>
       </div>
