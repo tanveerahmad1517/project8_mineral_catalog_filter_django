@@ -1,8 +1,11 @@
+import operator
+
 from collections import OrderedDict
 from django.db.models import Q
 from django.db.models.functions import Lower
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
+from functools import reduce
 
 
 from .models import Mineral
@@ -73,25 +76,30 @@ def search(request):
         Q(crystal_habit__icontains=term) |
         Q(specific_gravity__icontains=term)
     )
+
     return render(request, 'minerals/index.html', {'minerals': minerals})
 
 
 def mineral_by_category(request, category):
     if category == 'other':
-        minerals = Mineral.objects.exclude(
-            Q(category__icontains='silicate') |
-            Q(category__icontains='oxide') |
-            Q(category__icontains='sulfate') |
-            Q(category__icontains='sulfide') |
-            Q(category__icontains='carbonate') |
-            Q(category__icontains='halide') |
-            Q(category__icontains='sulfosalt') |
-            Q(category__icontains='phosphate') |
-            Q(category__icontains='borate') |
-            Q(category__icontains='organic') |
-            Q(category__icontains='arsenate') |
-            Q(category__icontains='native')
-        )
+        terms = [
+            'silicate',
+            'oxide',
+            'sulfate',
+            'sulfide',
+            'carbonate',
+            'halide',
+            'sulfosalt',
+            'phosphate',
+            'borate',
+            'organic',
+            'arsenate',
+            'native',
+        ]
+
+        query = reduce(operator.or_,
+                       (Q(category__icontains=term) for term in terms))
+        minerals = Mineral.objects.exclude(query)
     else:
         minerals = Mineral.objects.filter(category__icontains=category)
     return render(request, 'minerals/index.html',
@@ -99,16 +107,20 @@ def mineral_by_category(request, category):
 
 def mineral_by_color(request, color):
     if color == 'other':
-        minerals = Mineral.objects.exclude(
-            Q(color__icontains='red') |
-            Q(color__icontains='orange') |
-            Q(color__icontains='yellow') |
-            Q(color__icontains='green') |
-            Q(color__icontains='blue') |
-            Q(color__icontains='purple') |
-            Q(color__icontains='black') |
-            Q(color__icontains='white')
-        )
+        terms = [
+            'red',
+            'orange',
+            'yellow',
+            'green',
+            'blue',
+            'purple',
+            'black',
+            'white',
+        ]
+
+        query = reduce(operator.or_,
+                       (Q(color__icontains=term) for term in terms))
+        minerals = Mineral.objects.exclude(query)
     else:
         minerals = Mineral.objects.filter(color__icontains=color)
     return render(request, 'minerals/index.html',
