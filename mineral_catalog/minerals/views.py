@@ -56,26 +56,14 @@ def mineral_startswith(request, first_letter):
 def search(request):
     """Searches all the info displayed on the mineral detail page."""
     term = request.GET.get('q')
-    minerals = Mineral.objects.filter(
-        Q(name__icontains=term) |
-        Q(image_caption__icontains=term) |
-        Q(category__icontains=term) |
-        Q(formula__icontains=term) |
-        Q(strunz_classification__icontains=term) |
-        Q(crystal_system__icontains=term) |
-        Q(unit_cell__icontains=term) |
-        Q(color__icontains=term) |
-        Q(crystal_symmetry__icontains=term) |
-        Q(cleavage__icontains=term) |
-        Q(mohs_scale_hardness__icontains=term) |
-        Q(luster__icontains=term) |
-        Q(streak__icontains=term) |
-        Q(diaphaneity__icontains=term) |
-        Q(optical_properties__icontains=term) |
-        Q(refractive_index__icontains=term) |
-        Q(crystal_habit__icontains=term) |
-        Q(specific_gravity__icontains=term)
-    )
+
+    fields = [field for field in Mineral._meta.fields if field.name not in [
+        'id', 'image_filename']]
+    orm_lookups = ["%s__icontains" % field.name for field in fields]
+    or_queries = [Q(**{orm_lookup: term}) for orm_lookup in orm_lookups]
+
+    query = reduce(operator.or_, or_queries)
+    minerals = Mineral.objects.filter(query)
 
     return render(request, 'minerals/index.html', {'minerals': minerals})
 
