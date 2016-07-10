@@ -1,9 +1,6 @@
 import random
-from urllib.parse import quote
 from django import template
-from django.db.models import Count
 from django.utils.html import mark_safe
-from django.utils.six.moves.urllib.parse import unquote
 
 from minerals.models import Mineral
 
@@ -14,16 +11,16 @@ register = template.Library()
 @register.inclusion_tag('minerals/random_mineral.html')
 def random_mineral():
     """Returns a random mineral."""
-    total = Mineral.objects.count()
-    rand_id = random.randint(1, total)
+    all_ids = Mineral.objects.values_list('id', flat=True)
+    rand_id = random.choice(all_ids)
     mineral = Mineral.objects.get(id=rand_id)
     return {'mineral': mineral}
 
 
-@register.inclusion_tag('minerals/list_of_categories.html')
-def list_of_categories(category):
-    """Shows a list of clickable mineral categories."""
+@register.inclusion_tag('minerals/filter_colors_categories.html')
+def filter_colors_categories(chosen_color, chosen_category):
     categories = [
+        'all',
         'silicate',
         'oxide',
         'sulfate',
@@ -38,13 +35,9 @@ def list_of_categories(category):
         'native',
         'other',
     ]
-    return {'categories': categories, 'chosen_category': category}
 
-
-@register.inclusion_tag('minerals/list_of_colors.html')
-def list_of_colors(color):
-    """Shows a list of clickable mineral colors."""
     colors = [
+        'all',
         'red',
         'orange',
         'yellow',
@@ -55,7 +48,21 @@ def list_of_colors(color):
         'white',
         'other'
     ]
-    return {'colors': colors, 'chosen_color': color}
+
+    return {'categories': categories, 'chosen_category': chosen_category,
+            'colors': colors, 'chosen_color': chosen_color}
+
+
+@register.simple_tag
+def make_url(color, category):
+    if color == 'all' and category == 'all':
+        return ''
+    elif color == 'all':
+        return 'category={}'.format(category)
+    elif category == 'all':
+        return 'color={}'.format(color)
+    else:
+        return 'category={}&color={}'.format(category, color)
 
 
 @register.filter('underscore_to_space')
@@ -64,17 +71,6 @@ def underscore_to_space(string):
     new_string = string.replace('_', ' ')
     return new_string
 
-
-@register.filter('url_decode')
-def url_decode(value):
-    new_value = unquote(value)
-    return new_value
-
-
-@register.filter('url_quote')
-def url_quote(value):
-    new_value = quote(value)
-    return new_value
 
 
 @register.filter('highlight')

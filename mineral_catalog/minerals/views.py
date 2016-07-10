@@ -1,9 +1,11 @@
 import operator
 
 from collections import OrderedDict
+
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db.models.functions import Lower
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from functools import reduce
 
@@ -12,13 +14,73 @@ from .models import Mineral
 
 
 def mineral_list(request):
+    chosen_letter = request.GET.get('first_letter')
+    chosen_color = request.GET.get('color')
+    chosen_category = request.GET.get('category')
     minerals = Mineral.objects.order_by(Lower('name'))
-    return render(request, 'minerals/index.html', {'minerals': minerals})
+
+    if chosen_letter:
+        minerals = minerals.filter(name__startswith=chosen_letter)
+    if chosen_color:
+        if chosen_color == 'other':
+            terms = [
+                'red',
+                'orange',
+                'yellow',
+                'green',
+                'blue',
+                'purple',
+                'black',
+                'white',
+            ]
+
+            query = reduce(operator.or_,
+                           (Q(color__icontains=term) for term in terms))
+            minerals = minerals.exclude(query)
+        else:
+            minerals = minerals.filter(color__icontains=chosen_color)
+    else:
+        chosen_color = 'all'
+    if chosen_category:
+        if chosen_category == 'other':
+            terms = [
+                'silicate',
+                'oxide',
+                'sulfate',
+                'sulfide',
+                'carbonate',
+                'halide',
+                'sulfosalt',
+                'phosphate',
+                'borate',
+                'organic',
+                'arsenate',
+                'native',
+            ]
+
+            query = reduce(operator.or_,
+                           (Q(category__icontains=term) for term in terms))
+            minerals = minerals.exclude(query)
+        else:
+            minerals = minerals.filter(category__icontains=chosen_category)
+    else:
+        chosen_category = 'all'
+
+    return render(request, 'minerals/index.html', {
+            'minerals': minerals,
+            'chosen_letter': chosen_letter,
+            'chosen_color': chosen_color,
+            'chosen_category': chosen_category
+        }
+    )
 
 
 def mineral_detail(request, pk):
     ordered_properties = OrderedDict()
     order = [
+        'name',
+        'image_filename',
+        'image_caption',
         'category',
         'formula',
         'color',
@@ -44,72 +106,44 @@ def mineral_detail(request, pk):
         # Add only those fields that have a value.
         if mineral[key]:
             ordered_properties[key] = mineral[key]
-    return render(request, 'minerals/detail.html',
-                  {'mineral': mineral, 'properties': ordered_properties})
 
+    # Get ids of alphabetically previous and next minerals.
+    sorted_ids = Mineral.objects.order_by(Lower('name')).values_list('id',
+                                                                     flat=True)
+    sorted_ids = list(sorted_ids)
+    current_id = sorted_ids.index(int(pk))
+    if int(pk) == sorted_ids[-1]:
+        next_id = sorted_ids[0]
+    else:
+        next_id = sorted_ids[current_id+1]
 
-def mineral_startswith(request, first_letter):
-    minerals = Mineral.objects.filter(name__startswith=first_letter)
-    return render(request, 'minerals/index.html', {'minerals': minerals, 'chosen_letter': first_letter})
+    if int(pk) == sorted_ids[0]:
+        previous_id = sorted_ids[-1]
+    else:
+        previous_id = sorted_ids[current_id-1]
+
+    return render(request, 'minerals/detail.html', {
+        'properties': ordered_properties,
+        'next_id': next_id,
+        'previous_id': previous_id,
+    })
 
 
 def search(request):
     """Searches all the info displayed on the mineral detail page."""
     term = request.GET.get('q')
 
-    fields = [field for field in Mineral._meta.fields if field.name not in [
-        'id', 'image_filename']]
-    orm_lookups = ["%s__icontains" % field.name for field in fields]
+    fields = [field.name for field in Mineral._meta.fields if field.name
+              not in ['id', 'image_filename']]
+    orm_lookups = ["%s__icontains" % field for field in fields]
     or_queries = [Q(**{orm_lookup: term}) for orm_lookup in orm_lookups]
 
     query = reduce(operator.or_, or_queries)
     minerals = Mineral.objects.filter(query)
 
-    return render(request, 'minerals/index.html', {'minerals': minerals})
+    return render(request, 'minerals/index.html', {
+        'minerals': minerals,
+        'chosen_color': 'all',
+        'chosen_category': 'all',
+    })
 
-
-def mineral_by_category(request, category):
-    if category == 'other':
-        terms = [
-            'silicate',
-            'oxide',
-            'sulfate',
-            'sulfide',
-            'carbonate',
-            'halide',
-            'sulfosalt',
-            'phosphate',
-            'borate',
-            'organic',
-            'arsenate',
-            'native',
-        ]
-
-        query = reduce(operator.or_,
-                       (Q(category__icontains=term) for term in terms))
-        minerals = Mineral.objects.exclude(query)
-    else:
-        minerals = Mineral.objects.filter(category__icontains=category)
-    return render(request, 'minerals/index.html',
-                  {'minerals': minerals, 'chosen_category': category})
-
-def mineral_by_color(request, color):
-    if color == 'other':
-        terms = [
-            'red',
-            'orange',
-            'yellow',
-            'green',
-            'blue',
-            'purple',
-            'black',
-            'white',
-        ]
-
-        query = reduce(operator.or_,
-                       (Q(color__icontains=term) for term in terms))
-        minerals = Mineral.objects.exclude(query)
-    else:
-        minerals = Mineral.objects.filter(color__icontains=color)
-    return render(request, 'minerals/index.html',
-                  {'minerals': minerals, 'chosen_color': color})

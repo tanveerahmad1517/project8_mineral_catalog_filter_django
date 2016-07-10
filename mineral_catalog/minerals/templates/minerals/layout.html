@@ -31,9 +31,9 @@
         <ul class="alpha__list">
             {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
                 {% if letter == chosen_letter %}
-                    <li><a href="{% url 'minerals:startswith' first_letter=letter %}">{{ letter|upper|highlight }}</a></li>
+                      <li><a href="{% url 'minerals:list' %}?first_letter={{ letter }}">{{ letter|upper|highlight }}</a></li>
                 {% else %}
-                    <li><a href="{% url 'minerals:startswith' first_letter=letter %}">{{ letter|upper }}</a></li>
+                      <li><a href="{% url 'minerals:list' %}?first_letter={{ letter }}">{{ letter|upper }}</a></li>
                 {%  endif %}
             {% endfor %}
         </ul>
@@ -49,8 +49,7 @@
                 <input class="search__button" type="submit" value="Search">
               </form>
               <div class="circle--filter circle--secondary--module">
-                  {% list_of_categories chosen_category %}
-                  {% list_of_colors chosen_color %}
+                  {% filter_colors_categories chosen_color chosen_category %}
               </div>
             </div>
           </div>

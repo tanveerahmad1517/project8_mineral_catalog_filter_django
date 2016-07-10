@@ -1,19 +1,28 @@
-{% extends "layout.html" %}
+{% extends "minerals/layout.html" %}
 {% load static from staticfiles %}
 {% load mineral_extras %}
 
 {% block content %}
     <div class="grid-60 grid-push-30 mineral__container">
-      <h1 class="mineral__name">{{ mineral.name }}</h1>
+      <h1 class="mineral__name">{{ properties.name }}</h1>
+        <a class="arrow arrow--prev" href="{% url 'minerals:detail' pk=previous_id %}">
+          <svg viewBox="0 0 14.2 13.4" preserveAspectRatio="xMin YMin meet">
+            <polygon points="14.2,5.6 4,5.6 8,1.5 6.5,0 0,6.7 6.5,13.4 8,11.9 4,7.8 14.2,7.8 " />
+          </svg>
+        </a>
+        <a class="arrow arrow--next" href="{% url 'minerals:detail' pk=next_id %}">
+          <svg viewBox="0 0 14.2 13.4" preserveAspectRatio="xMin YMin meet">
+            <polygon points="0,7.8 10.2,7.8 6.2,11.9 7.7,13.4 14.2,6.7 7.7,0 6.2,1.5 10.2,5.6 0,5.6 " />
+          </svg>
+        </a>
       <div class="mineral__image-bg">
-        <img class="mineral__image" src="{% static 'images/' %}{{ mineral.image_filename|url_quote }}">
-        <!--<img class="mineral__image" src='/static/images/240px-Abernathyite%252C_Heinrichite-497484.jpg'>-->
-        <p class="mineral__caption">{{ mineral.image_caption }}</p>
+        <img class="mineral__image" src="{% static 'images/' %}{{ properties.image_filename }}">
+        <p class="mineral__caption">{{ properties.image_caption }}</p>
       </div>
       <div class="mineral__table-container">
         <table class="mineral__table">
           {% for name, value in properties.items %}
-            {% if value %}
+            {% if name != 'name' and name != 'image_filename' and name != 'image_caption' %}
               <tr>
                   <td class="mineral__category">{{ name|underscore_to_space|title }}</td>
               {% if name == 'formula' %}

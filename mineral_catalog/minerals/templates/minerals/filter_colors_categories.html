@@ -1,0 +1,23 @@
+{% load mineral_extras %}
+
+<h4>Category</h4>
+<ul class="circle--link--list">
+  {% for category in categories %}
+      {% if category == chosen_category %}
+          <li><a href="{% url 'minerals:list' %}?{% make_url chosen_color category %}">{{ category|title|highlight }}</a></li>
+      {% else %}
+          <li><a href="{% url 'minerals:list' %}?{% make_url chosen_color category %}">{{ category|title }}</a></li>
+      {% endif %}
+  {% endfor %}
+</ul>
+
+<h4>Color</h4>
+<ul class="circle--link--list">
+    {% for color in colors %}
+        {% if color == chosen_color %}
+            <li><a href="{% url 'minerals:list' %}?{% make_url color chosen_category %}">{{ color|title|highlight }}</a></li>
+        {% else %}
+            <li><a href="{% url 'minerals:list' %}?{% make_url color chosen_category %}">{{ color|title }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>

@@ -129,10 +129,14 @@ STATICFILES_DIRS = (
 # Use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+NOSE_COVER_CONFIG_FILE = [BASE_DIR]
+
 # Nose will measure coverage on the folllowing apps
 NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=minerals',
+    '--cover-html',
+    '--verbosity=2'
 ]
 
 
