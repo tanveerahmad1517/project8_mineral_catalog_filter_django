@@ -19,6 +19,7 @@ def random_mineral():
 
 @register.inclusion_tag('minerals/filter_colors_categories.html')
 def filter_colors_categories(chosen_color, chosen_category):
+    """Creates filter by color and category."""
     categories = [
         'all',
         'silicate',
@@ -55,6 +56,7 @@ def filter_colors_categories(chosen_color, chosen_category):
 
 @register.simple_tag
 def make_url(color, category):
+    """Makes GET query to search by color and category."""
     if color == 'all' and category == 'all':
         return ''
     elif color == 'all':
@@ -72,7 +74,7 @@ def underscore_to_space(string):
     return new_string
 
 
-
 @register.filter('highlight')
 def highlight(word):
+    """Adds HTML span tag to highlight a particular word."""
     return mark_safe("<span class='highlight'>%s</span>" % word)

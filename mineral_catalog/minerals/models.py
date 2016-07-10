@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Mineral(models.Model):
+    """Mineral model class."""
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     image_filename = models.URLField(blank=True, null=True)

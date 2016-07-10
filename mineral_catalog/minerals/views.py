@@ -1,26 +1,28 @@
 import operator
 
 from collections import OrderedDict
-
-from django.core.urlresolvers import reverse
+from functools import reduce
 from django.db.models import Q
 from django.db.models.functions import Lower
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from functools import reduce
+from django.http import Http404
+from django.shortcuts import render
 
 
 from .models import Mineral
 
 
 def mineral_list(request):
+    """Shows a sorted by name list of minerals all or filtered by the first
+    letter, color or category."""
     chosen_letter = request.GET.get('first_letter')
     chosen_color = request.GET.get('color')
     chosen_category = request.GET.get('category')
+
     minerals = Mineral.objects.order_by(Lower('name'))
 
     if chosen_letter:
         minerals = minerals.filter(name__startswith=chosen_letter)
+
     if chosen_color:
         if chosen_color == 'other':
             terms = [
@@ -41,6 +43,7 @@ def mineral_list(request):
             minerals = minerals.filter(color__icontains=chosen_color)
     else:
         chosen_color = 'all'
+
     if chosen_category:
         if chosen_category == 'other':
             terms = [
@@ -67,15 +70,15 @@ def mineral_list(request):
         chosen_category = 'all'
 
     return render(request, 'minerals/index.html', {
-            'minerals': minerals,
-            'chosen_letter': chosen_letter,
-            'chosen_color': chosen_color,
-            'chosen_category': chosen_category
-        }
-    )
+        'minerals': minerals,
+        'chosen_letter': chosen_letter,
+        'chosen_color': chosen_color,
+        'chosen_category': chosen_category
+    })
 
 
 def mineral_detail(request, pk):
+    """Shows mineral details."""
     ordered_properties = OrderedDict()
     order = [
         'name',
@@ -112,12 +115,17 @@ def mineral_detail(request, pk):
                                                                      flat=True)
     sorted_ids = list(sorted_ids)
     current_id = sorted_ids.index(int(pk))
+
+    # If the current mineral is the last in the list
     if int(pk) == sorted_ids[-1]:
+        # Assign the first mineral in the list as the next.
         next_id = sorted_ids[0]
     else:
         next_id = sorted_ids[current_id+1]
 
+    # If the current mineral is the first in the list
     if int(pk) == sorted_ids[0]:
+        # Assign the last mineral in the list as the previous.
         previous_id = sorted_ids[-1]
     else:
         previous_id = sorted_ids[current_id-1]
@@ -146,4 +154,3 @@ def search(request):
         'chosen_color': 'all',
         'chosen_category': 'all',
     })
-
