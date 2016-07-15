@@ -252,4 +252,4 @@ table, p, ul, form { margin-bottom: 2.5rem; }
 .alpha__list li { display: table-cell; text-align: center; }
 .alpha__list li a { display: block; color: #fff; font-size: 13px; font-weight: bold; transition: color 200ms ease-in-out; }
 .alpha__list li a:hover { color: #384033; }
-.highlight { color: #384033; }
+.highlight { color: #384033; font-size: 15px }
