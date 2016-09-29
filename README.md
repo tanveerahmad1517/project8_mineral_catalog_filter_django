@@ -1,4 +1,4 @@
-# mineral_catalog_filter_django
+# Mineral catalog
 
 A website that displays information about various minerals. 
 The home page of the site contains a list of all of the minerals in a database. 
